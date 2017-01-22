@@ -10,6 +10,7 @@
         height: 400px;
         width: 66%;
        }
+
     </style>
 </head>
 <body>
@@ -23,7 +24,11 @@
         </button>
         <!-- list -->
         <ul data-bind="foreach: filterLocations" class="result-list">
-            <li data-bind="text: name, click: function() { $parent.showDetails($index) }"><div data-bind="text: description, visible: showDescription"></div></li>
+            <li data-bind="text: name, click: function() { $parent.showDetails($index) }"> Bla </li>
+
+                <blockquote data-bind="text: description, visible: descVisible" class=""></blockquote>
+
+
         </ul>
     </div>
     <!-- map -->

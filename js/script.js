@@ -68,6 +68,7 @@ var Location = function(data){
     this.lat = ko.observable(data.lat);
     this.lng = ko.observable(data.lng);
     this.description = ko.observable(data.description);
+    this.descVisible = ko.observable(false);
 
 }
 
@@ -77,7 +78,6 @@ var ViewModel = function() {
     this.resultList = ko.observableArray([]);
     var url="https://maps.googleapis.com/maps/api/js?key=AIzaSyBFfd_W6FyD5M5YQVTwDKnP4mX4Tosj2Yw"
     this.txtFilter = ko.observable();
-    this.showDescription = ko.observableArray(false);
     $.ajax({
         'url': url,
         'dataType':'jsonp',
@@ -97,7 +97,7 @@ var ViewModel = function() {
     this.refreshLocations = function refreshLocations(filteredLoc){
         locations = [];
         filteredLoc.forEach(function(loc,index){
-            locations.push(formatLoc(loc.lat(),loc.lng(),loc.name(),loc.description()));
+            locations.push(formatLoc(loc.lat(),loc.lng(),loc.name(),loc.description(),loc.descVisible(false)));
         })
         clearMarkers();
         updateMarkers(locations,map)
@@ -107,9 +107,6 @@ var ViewModel = function() {
         if(!self.txtFilter()) {
             return self.resultList();
         } else {
-            // return ko.utils.arrayFilter(self.resultList(), function(loc) {
-            //     return loc.name().toLowerCase().indexOf(self.txtFilter().toLowerCase())>=0;
-            // });
             var oTemp = ko.utils.arrayFilter(self.resultList(), function(loc) {
                  return loc.name().toLowerCase().indexOf(self.txtFilter().toLowerCase())>=0;
             });
@@ -118,14 +115,18 @@ var ViewModel = function() {
 
         }
     });
-    this.showDetails = function(index){
+    this.showDetails = function(index) {
         if(markers)
         {
-            clearMarkers()
-            self.showDescription(true);
-            updateMarkers(locations,map)
+            clearMarkers();
+            //self.refreshDesc();
+            if (self.filterLocations()[index()].descVisible()){
+                self.filterLocations()[index()].descVisible(false);
+            }else{
+                self.filterLocations()[index()].descVisible(true);
+            }
+            updateMarkers(locations,map);
             animateMarker(markers[index()]);
-
         }
     }
     self.filter = function () {
