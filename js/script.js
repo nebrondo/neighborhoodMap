@@ -1,6 +1,8 @@
 
 var map;
 var markers;
+var infoWindow;
+var infoWindowMsg;
 var labels = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
 
 function initMap() {
@@ -11,6 +13,7 @@ function initMap() {
       zoom: 5,
       center: uluru
     });
+
     updateMarkers(locations,map);
 }
 function animateMarker(marker) {
@@ -19,12 +22,23 @@ function animateMarker(marker) {
 }
 function updateMarkers(data){
     markers = data.map(function(location, i) {
-          return new google.maps.Marker({
+        marker = new google.maps.Marker({
             position: {lat:location.lat,lng:location.lng},
             //label: labels[i % labels.length],
             title: location.name,
             //icon: "http://cdn.mysitemyway.com/etc-mysitemyway/icons/legacy-previews/icons-256/green-jelly-icons-sports-hobbies/045315-green-jelly-icon-sports-hobbies-marker.png"
           });
+
+        marker.addListener('click', function() {
+            stopAnimation();
+            this.setAnimation(google.maps.Animation.BOUNCE);
+            infoWindow = new google.maps.InfoWindow({content:location.description});
+            infoWindow.open(map,this);
+            setTimeout(function () { infoWindow.close(); }, 5000);
+        });
+        return marker;
+
+
     });
     showMarkers();
     //var markerCluster = new MarkerClusterer(map, markers);
@@ -33,12 +47,21 @@ var formatLoc = function(lat,lng,name,desc){
     return {lat:lat,lng:lng,name:name,description:desc};
 }
 
-
+function stopAnimation() {
+    for (var i = 0; i < markers.length; i++) {
+      markers[i].setAnimation(null)
+    }
+}
 // Sets the map on all markers in the array.
 function setMapOnAll(map) {
     for (var i = 0; i < markers.length; i++) {
-      markers[i].setAnimation(null)
-      markers[i].setMap(map);
+        markers[i].setAnimation(null)
+        markers[i].setMap(map);
+        // markers[i].addListener('click', function() {
+        //     stopAnimation();
+        //     this.setAnimation(google.maps.Animation.BOUNCE);
+        //     infoWindow.open(map,this);
+        // });
     }
 }
 function showMarkers() {
@@ -122,16 +145,19 @@ var ViewModel = function() {
             //self.refreshDesc();
             self.toggleDetails(index)
             updateMarkers(locations,map);
+            // infoWindow=infowindow = new google.maps.InfoWindow({
+            //     content: self.filterLocations()[index()].description()
+            // });
             map.setCenter({lat:self.filterLocations()[index()].lat(),lng:self.filterLocations()[index()].lng()})
             animateMarker(markers[index()]);
         }
     }
     this.toggleDetails = function(index) {
         if (self.filterLocations()[index()].descVisible()){
-                self.filterLocations()[index()].descVisible(false);
-            }else {
-                self.filterLocations()[index()].descVisible(true);
-            }
+            self.filterLocations()[index()].descVisible(false);
+        } else {
+            self.filterLocations()[index()].descVisible(true);
+        }
     }
     self.filter = function () {
 
