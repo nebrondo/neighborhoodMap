@@ -88,9 +88,9 @@ var ViewModel = function() {
         self.resultList.push(new Location(location));
     })
 
-    this.refreshLocations = function refreshLocations(){
+    this.refreshLocations = function refreshLocations(filteredLoc){
         locations = [];
-        self.filterLocations().forEach(function(loc,index){
+        filteredLoc.forEach(function(loc,index){
             locations.push(formatLoc(loc.lat(),loc.lng(),loc.name()));
         })
         clearMarkers();
@@ -101,9 +101,15 @@ var ViewModel = function() {
         if(!self.txtFilter()) {
             return self.resultList();
         } else {
-            return ko.utils.arrayFilter(self.resultList(), function(loc) {
-                return loc.name().toLowerCase().indexOf(self.txtFilter().toLowerCase())>=0;
+            // return ko.utils.arrayFilter(self.resultList(), function(loc) {
+            //     return loc.name().toLowerCase().indexOf(self.txtFilter().toLowerCase())>=0;
+            // });
+            var oTemp = ko.utils.arrayFilter(self.resultList(), function(loc) {
+                 return loc.name().toLowerCase().indexOf(self.txtFilter().toLowerCase())>=0;
             });
+            self.refreshLocations(oTemp);
+            return oTemp;
+
         }
     });
 
