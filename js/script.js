@@ -120,14 +120,18 @@ var ViewModel = function() {
         {
             clearMarkers();
             //self.refreshDesc();
-            if (self.filterLocations()[index()].descVisible()){
-                self.filterLocations()[index()].descVisible(false);
-            }else{
-                self.filterLocations()[index()].descVisible(true);
-            }
+            self.toggleDetails(index)
             updateMarkers(locations,map);
+            map.setCenter({lat:self.filterLocations()[index()].lat(),lng:self.filterLocations()[index()].lng()})
             animateMarker(markers[index()]);
         }
+    }
+    this.toggleDetails = function(index) {
+        if (self.filterLocations()[index()].descVisible()){
+                self.filterLocations()[index()].descVisible(false);
+            }else {
+                self.filterLocations()[index()].descVisible(true);
+            }
     }
     self.filter = function () {
 
