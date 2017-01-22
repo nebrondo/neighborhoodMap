@@ -18,7 +18,13 @@ function initMap() {
 }
 function animateMarker(marker) {
     if (marker)
-      marker.setAnimation(google.maps.Animation.BOUNCE);
+    {
+        marker.setAnimation(google.maps.Animation.BOUNCE);
+        setTimeout(function () {
+            marker.setAnimation(null);
+        }, 3000);
+    }
+
 }
 function updateMarkers(data){
     markers = data.map(function(location, i) {
@@ -30,11 +36,16 @@ function updateMarkers(data){
           });
 
         marker.addListener('click', function() {
-            stopAnimation();
-            this.setAnimation(google.maps.Animation.BOUNCE);
+            if (marker.setAnimation)
+            {
+                stopAnimation();
+                animateMarker(this);
+                //this.setAnimation(google.maps.Animation.BOUNCE);
+            }
+            if (infoWindow)
+                infoWindow.close();
             infoWindow = new google.maps.InfoWindow({content:location.description});
             infoWindow.open(map,this);
-            setTimeout(function () { infoWindow.close(); }, 5000);
         });
         return marker;
 
@@ -48,8 +59,11 @@ var formatLoc = function(lat,lng,name,desc){
 }
 
 function stopAnimation() {
-    for (var i = 0; i < markers.length; i++) {
-      markers[i].setAnimation(null)
+    if (markers)
+    {
+        for (var i = 0; i < markers.length; i++) {
+          markers[i].setAnimation(null)
+        }
     }
 }
 // Sets the map on all markers in the array.
@@ -57,11 +71,6 @@ function setMapOnAll(map) {
     for (var i = 0; i < markers.length; i++) {
         markers[i].setAnimation(null)
         markers[i].setMap(map);
-        // markers[i].addListener('click', function() {
-        //     stopAnimation();
-        //     this.setAnimation(google.maps.Animation.BOUNCE);
-        //     infoWindow.open(map,this);
-        // });
     }
 }
 function showMarkers() {
@@ -123,7 +132,7 @@ var ViewModel = function() {
             locations.push(formatLoc(loc.lat(),loc.lng(),loc.name(),loc.description(),loc.descVisible(false)));
         })
         clearMarkers();
-        updateMarkers(locations,map)
+        updateMarkers(locations,map);
     }
 
     this.filterLocations = ko.computed(function() {
@@ -142,12 +151,8 @@ var ViewModel = function() {
         if(markers)
         {
             clearMarkers();
-            //self.refreshDesc();
             self.toggleDetails(index)
             updateMarkers(locations,map);
-            // infoWindow=infowindow = new google.maps.InfoWindow({
-            //     content: self.filterLocations()[index()].description()
-            // });
             map.setCenter({lat:self.filterLocations()[index()].lat(),lng:self.filterLocations()[index()].lng()})
             animateMarker(markers[index()]);
         }
