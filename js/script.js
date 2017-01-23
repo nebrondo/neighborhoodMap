@@ -24,45 +24,17 @@ function loadData() {
 
     var $body = $('body');
     var $wikiElem = $('#wikipedia-links');
-    var $nytHeaderElem = $('#nytimes-header');
-    var $nytElem = $('#nytimes-articles');
+
+
     var $greeting = $('#greeting');
     var $svImg = $('#svImg')
-    var $inputStreet = $('#street')
+
     var $inputCity = $('#city')
-    var nytAPIKey = "49a224ee282d4eb68da6e9f97e81e2fd"
+
     // clear out old data before new request
     $wikiElem.text("");
-    $nytElem.text("");
+
     var sCity=$inputCity[0].value,sAddress=$inputStreet[0].value;
-    var imgSrc
-    var imgTag = "<img id='svImg' class='bgimg' src=''>"
-    // load streetview
-    imgSrc = "http://maps.googleapis.com/maps/api/streetview?size=600x300&location="
-
-    imgSrc += (sAddress).replace(/ /g,"%20") + "," + (sCity).replace(/ /g,"%20")
-    imgTag = imgTag.replace("src=''","src='"+imgSrc+"'")
-    $body.append($(imgTag))
-    // YOUR CODE GOES HERE!
-
-    var url = "https://api.nytimes.com/svc/search/v2/articlesearch.json";
-    url += '?' + $.param({
-      'api-key': "49a224ee282d4eb68da6e9f97e81e2fd",
-      'q': sCity,
-      'begin_date': "20100101"
-    });
-
-    var items = [];
-    $.getJSON(url,function(data){
-        console.log(data)
-        $.each( data.response.docs, function( key, val ) {
-            items.push( "<li id='" + key + "'>" + val.headline.main + "</li>" );
-        });
-        var nytItems = items.join("");
-        $nytElem.append(nytItems);
-    }).fail(function(e){
-        $nytElem.append("<b>Articles could not be loaded</b>");
-    });
 
     url = "http://en.wikipedia.org/w/api.php"
     url += '?' + $.param({
