@@ -20,6 +20,83 @@ var locations = [
     {lat: 41.92, lng: -110.39,name:"Kemmerer",description:"Kemmerer is both the largest city and the county seat of Lincoln County, Wyoming, United States. The population was 2,656 at the 2010 census. As the county seat of Lincoln County, Kemmerer is the location of the Lincoln County Courthouse."}
     ]
 
+function loadData() {
+
+    var $body = $('body');
+    var $wikiElem = $('#wikipedia-links');
+    var $nytHeaderElem = $('#nytimes-header');
+    var $nytElem = $('#nytimes-articles');
+    var $greeting = $('#greeting');
+    var $svImg = $('#svImg')
+    var $inputStreet = $('#street')
+    var $inputCity = $('#city')
+    var nytAPIKey = "49a224ee282d4eb68da6e9f97e81e2fd"
+    // clear out old data before new request
+    $wikiElem.text("");
+    $nytElem.text("");
+    var sCity=$inputCity[0].value,sAddress=$inputStreet[0].value;
+    var imgSrc
+    var imgTag = "<img id='svImg' class='bgimg' src=''>"
+    // load streetview
+    imgSrc = "http://maps.googleapis.com/maps/api/streetview?size=600x300&location="
+
+    imgSrc += (sAddress).replace(/ /g,"%20") + "," + (sCity).replace(/ /g,"%20")
+    imgTag = imgTag.replace("src=''","src='"+imgSrc+"'")
+    $body.append($(imgTag))
+    // YOUR CODE GOES HERE!
+
+    var url = "https://api.nytimes.com/svc/search/v2/articlesearch.json";
+    url += '?' + $.param({
+      'api-key': "49a224ee282d4eb68da6e9f97e81e2fd",
+      'q': sCity,
+      'begin_date': "20100101"
+    });
+
+    var items = [];
+    $.getJSON(url,function(data){
+        console.log(data)
+        $.each( data.response.docs, function( key, val ) {
+            items.push( "<li id='" + key + "'>" + val.headline.main + "</li>" );
+        });
+        var nytItems = items.join("");
+        $nytElem.append(nytItems);
+    }).fail(function(e){
+        $nytElem.append("<b>Articles could not be loaded</b>");
+    });
+
+    url = "http://en.wikipedia.org/w/api.php"
+    url += '?' + $.param({
+      'action': 'opensearch',
+      'search': sCity,
+      'format':'json'
+
+    });
+    var w_items = [];
+    var wikiRequestTimeout = setTimeout(function(){
+        $wikiElem.text("Failed do get wikipedia resources.")
+    },8000)
+    $.ajax({
+        'url': url,
+        'dataType':'jsonp',
+        'crossDomain':true,
+        'success':function(data) {
+            console.log(data)
+            $.each( data[1], function( key, val ) {
+                w_items.push( "<li id='" + key + "'><a href='" + data[3][key] + "'>" + val + "</a></li>" );
+            });
+            var wikiItems = w_items.join("");
+            $wikiElem.append(wikiItems);
+            clearTimeout(wikiRequestTimeout);
+        }
+    }).done(function(){
+        console.log('Done?')
+    })
+
+    return false;
+};
+
+
+
 function initMap() {
     //33.9245199,-118.3870989
 
