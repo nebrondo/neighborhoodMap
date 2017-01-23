@@ -18,10 +18,10 @@
     <div  class="col-sm-4">
         <!-- filter -->
         <input type="text" data-bind="value: txtFilter, valueUpdate: 'afterkeydown'">
-        <button data-bind="click: function() { refreshLocations() }">
+<!--         <button data-bind="click: function() { refreshLocations() }">
             <span class="glyphicon glyphicon-filter"></span>
             Filter
-        </button>
+        </button> -->
         <!-- list -->
         <ul data-bind="foreach: filterLocations" class="result-list">
             <li data-bind="text: name, click: function() { $parent.showDetails($index) }"> Bla </li>
