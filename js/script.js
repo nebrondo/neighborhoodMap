@@ -35,10 +35,10 @@ var locations = [
     {lat: 41.92, lng: -110.39,name:"Kemmerer",description:""}
     ]
 
-function loadData() {
+function loadData(cb) {
 
 
-    locations.forEach(function(location){
+    locations.forEach(function(location,index){
         //self.resultList.push(new Location(location));
 
 
@@ -60,13 +60,14 @@ function loadData() {
             'crossDomain':true,
             'success':function(data) {
                 console.log(data)
-                // $.each( data[1], function( key, val ) {
-                //     w_items.push( "<li id='" + key + "'><a href='" + data[3][key] + "'>" + val + "</a></li>" );
-                // });
+                $.each( data[2], function( key, val ) {
+                    if (val.length > 10)
+                        locations[index].description = val;
+                });
                 // var wikiItems = w_items.join("");
                 // $wikiElem.append(wikiItems);
 
-                location.description = data[2][1]
+                // location.description = data[2][1]
 
                 clearTimeout(wikiRequestTimeout);
             }
@@ -77,7 +78,7 @@ function loadData() {
 
     })
 
-    return false;
+    cb;
 };
 
 
@@ -183,10 +184,48 @@ function clearMarkers() {
 
 
 var Location = function(data){
+    var self = this;
     this.name = ko.observable(data.name);
     this.lat = ko.observable(data.lat);
     this.lng = ko.observable(data.lng);
-    this.description = ko.observable(data.description);
+    //this.description = ko.observable(data.description);
+    this.description = ko.computed(function(){
+        var tempDesc="";
+        url = "http://en.wikipedia.org/w/api.php"
+        url += '?' + $.param({
+          'action': 'opensearch',
+          'search': self.name,
+          'format':'json'
+
+        });
+        var w_items = [];
+        var wikiRequestTimeout = setTimeout(function(){
+            tempDesc = "Failed do get descriptions from Wikipedia.";
+        },8000)
+        $.ajax({
+            'url': url,
+            'dataType':'jsonp',
+            'crossDomain':true,
+            'success':function(data) {
+                console.log(data)
+
+                $.each( data[2], function( key, val ) {
+                    if (val.length > 10)
+                        tempDesc = val;
+                });
+                return tempDesc;
+                // var wikiItems = w_items.join("");
+                // $wikiElem.append(wikiItems);
+
+                // location.description = data[2][1]
+
+                clearTimeout(wikiRequestTimeout);
+            }
+        }).done(function(){
+            console.log('Done?')
+        })
+        //return tempDesc;
+    })
     this.descVisible = ko.observable(false);
 
 }
@@ -194,7 +233,7 @@ var Location = function(data){
 var ViewModel = function() {
     var self = this;
 
-    loadData();
+
     this.resultList = ko.observableArray([]);
     var url="https://maps.googleapis.com/maps/api/js?key=AIzaSyBFfd_W6FyD5M5YQVTwDKnP4mX4Tosj2Yw"
     this.txtFilter = ko.observable();
@@ -204,15 +243,20 @@ var ViewModel = function() {
         'crossDomain':true,
         'success':function(data) {
             console.log(data)
-            initMap();
+            //loadData();
+
         }
     }).done(function(){
-        console.log('Done?')
+        initMap();
+        loadData(function(){
+            locations.forEach(
+                function(location){
+                    self.resultList.push(new Location(location));
+                })
+        });
     })
 
-    locations.forEach(function(location){
-        self.resultList.push(new Location(location));
-    })
+
 /*
     refreshLocations: Refreshes locations array based on contents of filteredLoc
 
