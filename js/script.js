@@ -36,34 +36,29 @@ var locations = [
     ]
 
 function loadData(cb) {
-
-
     locations.forEach(function(location,index){
         //self.resultList.push(new Location(location));
-
-
-
         url = "http://en.wikipedia.org/w/api.php"
         url += '?' + $.param({
           'action': 'opensearch',
           'search': location.name,
           'format':'json'
-
         });
         var w_items = [];
         var wikiRequestTimeout = setTimeout(function(){
-            $wikiElem.text("Failed do get descriptions from Wikipedia.")
+            location.description = "Failed do get descriptions from Wikipedia.";
         },8000)
         $.ajax({
             'url': url,
             'dataType':'jsonp',
             'crossDomain':true,
             'success':function(data) {
-                console.log(data)
+                console.log(data);
                 $.each( data[2], function( key, val ) {
                     if (val.length > 10)
                         locations[index].description = val;
                 });
+                cb;
                 // var wikiItems = w_items.join("");
                 // $wikiElem.append(wikiItems);
 
@@ -71,14 +66,10 @@ function loadData(cb) {
 
                 clearTimeout(wikiRequestTimeout);
             }
-        }).done(function(){
-            console.log('Done?')
         })
+    });
 
 
-    })
-
-    cb;
 };
 
 
@@ -243,17 +234,15 @@ var ViewModel = function() {
         'crossDomain':true,
         'success':function(data) {
             console.log(data)
-            //loadData();
+            initMap();
+            loadData(function(){
+                locations.forEach(
+                    function(location){
+                        self.resultList.push(new Location(location));
+                    })
+            });
 
         }
-    }).done(function(){
-        initMap();
-        loadData(function(){
-            locations.forEach(
-                function(location){
-                    self.resultList.push(new Location(location));
-                })
-        });
     })
 
 
