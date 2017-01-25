@@ -14,15 +14,8 @@
     </style>
 </head>
 <body>
-
     <div  class="col-sm-4">
-        <!-- filter -->
         <label>Filter locations: </label><input type="text" data-bind="value: txtFilter, valueUpdate: 'afterkeydown'">
-<!--         <button data-bind="click: function() { refreshLocations() }">
-            <span class="glyphicon glyphicon-filter"></span>
-            Filter
-        </button> -->
-        <!-- list -->
         <ul data-bind="foreach: filterLocations" class="result-list">
             <li data-bind="text: name, click: function() { $parent.showDetails($index) }"> Bla </li>
 
@@ -31,31 +24,12 @@
 
         </ul>
     </div>
-    <!-- map -->
     <div id="map" class="col-sm-8"></div>
-
-
-
-
-<!--     <button id="admin-but">Admin</button>
-
-    <div id="admin-div">
-        <label for="name-input">Cat Name:</label><input id="name-input">
-        <label for="pic-input">Cat Pic:</label><input id="pic-input">
-        <label for="clicks-input">Clicks:</label><input id="clicks-input">
-        <button id="cancel-but">Cancel</button>
-        <button id="save-but">Save</button>
-    </div> -->
-<!--
-    <script async defer
-    src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBFfd_W6FyD5M5YQVTwDKnP4mX4Tosj2Yw&callback=initMap">
-    </script>
--->
     <script src="https://developers.google.com/maps/documentation/javascript/examples/markerclusterer/markerclusterer.js">
     </script>
     <script src="js/knockout-3.4.1.js"></script>
-    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
-
+    <script src="js/jquery-1.11.1.js"></script>
+    <script src="js/maps.js"></script>
     <script src="js/script.js"></script>
 
 
