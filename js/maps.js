@@ -1,3 +1,4 @@
+var infoWindow;
 function initMap() {
     var els = {lat: 33.92, lng: -118.39};
     map = new google.maps.Map(document.getElementById('map'), {
@@ -5,6 +6,7 @@ function initMap() {
       center: els
     });
     initMarkers(locations);
+    infoWindow = new google.maps.InfoWindow();
 }
 /*
     initMarkers: creates a collection of markers to be put into the map.
@@ -45,12 +47,13 @@ function setMarker(marker,desc) {
         marker.setAnimation(google.maps.Animation.BOUNCE);
         setTimeout(function () {
             marker.setAnimation(null);
-        }, 3000);
+        }, 1400);
         //this.setAnimation(google.maps.Animation.BOUNCE);
     }
+
     if (infoWindow)
         infoWindow.close();
-    infoWindow = new google.maps.InfoWindow({content:desc});
+    infoWindow.setContent(desc);
     infoWindow.open(map,marker);
 
 }
@@ -65,7 +68,7 @@ function stopAnimation() {
 // Sets the map on all markers in the array.
 function setMapOnAll(map) {
     for (var i = 0; i < markers.length; i++) {
-        markers[i].setAnimation(null)
+        markers[i].setAnimation(null);
         markers[i].setMap(map);
     }
 }

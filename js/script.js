@@ -1,6 +1,6 @@
 var map;
 var markers;
-var infoWindow;
+
 var infoWindowMsg;
 var wikiData=ko.observableArray([]);
 var labels = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';

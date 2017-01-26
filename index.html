@@ -2,29 +2,21 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Neighborhood Maps</title>
-    <link rel="stylesheet" type="text/css" href="css/bootstrap.min.css">
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
-    <style>
-       #map {
-        height: 400px;
-        width: 66%;
-       }
-
-    </style>
+    <link rel="stylesheet" href="css/bootstrap.min.css">
+    <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
-    <div  class="col-sm-4">
-        <label>Filter locations: </label><input type="text" data-bind="value: txtFilter, valueUpdate: 'afterkeydown'">
+    <section  class="col-sm-4">
+        <label>Filter locations: </label>
+        <input type="text" data-bind="value: txtFilter, valueUpdate: 'afterkeydown'">
         <ul data-bind="foreach: filterLocations" class="result-list">
             <li data-bind="text: name, click: function() { $parent.showDetails($index) }"> Bla </li>
-
                 <blockquote data-bind="text: description, visible: descVisible" class=""></blockquote>
-
-
         </ul>
-    </div>
-    <div id="map" class="col-sm-8"></div>
+    </section>
+    <section id="map" class="col-sm-8"></section>
     <script src="https://developers.google.com/maps/documentation/javascript/examples/markerclusterer/markerclusterer.js">
     </script>
     <script src="js/knockout-3.4.1.js"></script>
