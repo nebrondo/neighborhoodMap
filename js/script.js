@@ -47,7 +47,6 @@ function loadData() {
                         locations[index].description = val;
                 });
                 wikiData.push(data);
-                cb;
                 clearTimeout(wikiRequestTimeout);
             }
         })
