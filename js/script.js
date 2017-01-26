@@ -18,8 +18,13 @@ var locations = [
     {lat: 40.92, lng: -110.39,name:'Uinta-Wasatch-Cache National Forest',description:''},
     {lat: 41.92, lng: -110.39,name:'Kemmerer',description:''}
 ];
+
 var filteredLocations;
-function loadData(cb) {
+
+/*
+    loadData: Used to load data for the map to display description in markers
+*/
+function loadData() {
     locations.forEach(function(location,index) {
         url = 'http://en.wikipedia.org/w/api.php'
         url += '?' + $.param({
@@ -48,7 +53,10 @@ function loadData(cb) {
         })
     });
 };
-function loadMap(cb) {
+/*
+    loadMap: Makes Ajax call prior to initialize the Map in the page.
+*/
+function loadMap() {
     var url='https://maps.googleapis.com/maps/api/js?key=AIzaSyBFfd_W6FyD5M5YQVTwDKnP4mX4Tosj2Yw'
     $.ajax({
         'url': url,
@@ -57,7 +65,6 @@ function loadMap(cb) {
         'success':function(data) {
             console.log(data)
             initMap();
-            cb;
         }
     });
 }
@@ -91,21 +98,14 @@ var Location = function(data,index) {
         })
     },this);
     this.descVisible = ko.observable(false);
-
 }
-
+/*
+    ViewModel: View Model for the App
+*/
 var ViewModel = function() {
-    // 1. Pull wiki data
-    // 2. Associate with locations object and resultList observable
-    // 3. Associate with filter locations
-    // 4. Load Map
-    // 5. Initialize markers and infoWindow
-
     var self = this;
     this.txtFilter = ko.observable();
     this.resultList = ko.observableArray([]);
-
-
     this.initLocations = ko.computed(function(){
         locations.forEach(
             function(location,index){
@@ -113,9 +113,8 @@ var ViewModel = function() {
             }
         );
     });
-    loadData(loadMap());
-
-
+    loadData();
+    loadMap();
 
 /*
     refreshLocations: Refreshes locations array based on contents of filteredLoc
@@ -164,19 +163,15 @@ var ViewModel = function() {
             self.refreshLocations(self.filterLocations());
             self.filterLocations()[index()].descVisible(true);
             setMarker(markers[index()],desc);
-            //initMarkers(locations);
-            map.setCenter({lat:lat,lng:lng})
+            map.setCenter({lat:lat,lng:lng});
             setMarker(markers[index()],desc);
         }
 
     }
     self.filter = function () {
-
         self.txtFilter({name:self.txtFilter()});
     }
-
     this.currentLocation = ko.observable(this.resultList()[0]);
-
 }
 
 ko.applyBindings(new ViewModel())
