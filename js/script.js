@@ -21,7 +21,7 @@ var locations = [
 ];
 function getDescription(name,index,cb){
     if (locations[index].description == '') {
-        url = 'http://en.wikipedia.org/w/api.php'
+        url = 'http://en.wikipedia.org/w/api.phpo'
         url += '?' + $.param({
           'action': 'opensearch',
           'search': name,
@@ -45,7 +45,7 @@ function getDescription(name,index,cb){
             }
         }).fail(function(jqXHR, textStatus){
             console.log('No descriptions found in Wikipedia: '+textStatus);
-            locations[index].description('Error getting description: ' + textStatus);
+            locations[index].description ='Error getting description: ' + textStatus;
             cb(locations[index].description);
         })
     } else {
