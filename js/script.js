@@ -1,7 +1,8 @@
 var map;
 var markers;
 
-var infoWindowMsg = ko.observable();
+var currentIndex = ko.observable(0);
+var currentLocation = ko.observable();
 var wikiData=ko.observableArray([]);
 var labels = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
 var locations = [
@@ -67,7 +68,7 @@ var ViewModel = function() {
             }
         );
     });
-    this.currentLocation = ko.observable(this.resultList()[0]);
+
     /*
         refreshLocations: Refreshes locations array based on contents of filteredLoc
 

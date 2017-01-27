@@ -30,7 +30,7 @@ function initMarkers(data) {
         marker.addListener('click', function() {
             if (marker.setAnimation)
             {
-                setMarker(this,location.description);
+                setMarker(this,locations[i].description);
             }
         });
 
