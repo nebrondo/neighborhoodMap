@@ -7,7 +7,9 @@ function initMap() {
     });
     initMarkers(locations);
     infoWindow = new google.maps.InfoWindow();
+
 }
+
 /*
     initMarkers: creates a collection of markers to be put into the map.
                    It creates a click listener to enable animation and
@@ -31,6 +33,7 @@ function initMarkers(data) {
                 setMarker(this,location.description);
             }
         });
+
         return marker;
 
 
@@ -48,6 +51,7 @@ function setMarker(marker,desc) {
         setTimeout(function () {
             marker.setAnimation(null);
         }, 1400);
+        //map.setCenter(marker.getPosition());
         //this.setAnimation(google.maps.Animation.BOUNCE);
     }
 
@@ -78,4 +82,7 @@ function showMarkers() {
 // Removes the markers from the map, but keeps them in the array.
 function clearMarkers() {
     setMapOnAll(null);
+}
+function googleError(){
+    alert("Error loading map.");
 }

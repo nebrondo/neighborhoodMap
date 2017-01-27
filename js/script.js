@@ -1,7 +1,7 @@
 var map;
 var markers;
 
-var infoWindowMsg;
+var infoWindowMsg = ko.observable();
 var wikiData=ko.observableArray([]);
 var labels = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
 var locations = [
@@ -20,58 +20,11 @@ var locations = [
 ];
 
 var filteredLocations;
-
-/*
-    loadData: Used to load data for the map to display description in markers
-*/
-function loadData() {
-    locations.forEach(function(location,index) {
-        url = 'http://en.wikipedia.org/w/api.php'
-        url += '?' + $.param({
-          'action': 'opensearch',
-          'search': location.name,
-          'format':'json'
-        });
-        var w_items = [];
-        var wikiRequestTimeout = setTimeout(function(){
-            locations[index].description = 'Failed do get descriptions from Wikipedia.';
-        },8000)
-        $.ajax({
-            'url': url,
-            'dataType':'jsonp',
-            'crossDomain':true,
-            'success':function(data) {
-                console.log(data);
-                $.each( data[2], function( key, val ) {
-                    if (val.length > 10)
-                        locations[index].description = val;
-                });
-                wikiData.push(data);
-                clearTimeout(wikiRequestTimeout);
-            }
-        })
-    });
-};
-/*
-    loadMap: Makes Ajax call prior to initialize the Map in the page.
-*/
-function loadMap() {
-    var url='https://maps.googleapis.com/maps/api/js?key=AIzaSyBFfd_W6FyD5M5YQVTwDKnP4mX4Tosj2Yw'
-    $.ajax({
-        'url': url,
-        'dataType':'jsonp',
-        'crossDomain':true,
-        'success':function(data) {
-            console.log(data)
-            initMap();
-        }
-    });
-}
 var Location = function(data,index) {
     var self = this;
-    this.name = ko.observable(data.name);
-    this.lat = ko.observable(data.lat);
-    this.lng = ko.observable(data.lng);
+    this.name = data.name;
+    this.lat = data.lat;
+    this.lng = data.lng;
     this.description = ko.observable('');
     this.getDescription = ko.computed(function() {
         this.description('No data received for this location');
@@ -94,6 +47,8 @@ var Location = function(data,index) {
                 });
                 wikiData.push(data);
             }
+        }).fail(function(jqXHR, textStatus){
+            console.log('No descriptions found in Wikipedia: '+textStatus);
         })
     },this);
     this.descVisible = ko.observable(false);
@@ -112,53 +67,51 @@ var ViewModel = function() {
             }
         );
     });
-    loadData();
-    loadMap();
+    this.currentLocation = ko.observable(this.resultList()[0]);
+    /*
+        refreshLocations: Refreshes locations array based on contents of filteredLoc
 
-/*
-    refreshLocations: Refreshes locations array based on contents of filteredLoc
-
-    Parameters:
-        data: array of location data to be used by each marker and infoWindow
+        Parameters:
+            data: array of location data to be used by each marker and infoWindow
 
 
-*/
+    */
     this.refreshLocations = function refreshLocations(filteredLoc) {
         filteredLocations = [];
         filteredLoc.forEach(function(loc,index) {
-            filteredLocations.push(formatLoc(loc.lat(),loc.lng(),loc.name(),loc.description(),loc.descVisible(false)));
+            filteredLocations.push(formatLoc(loc.lat,loc.lng,loc.name,loc.description(),loc.descVisible(false)));
         })
         clearMarkers();
         initMarkers(filteredLocations);
     }
-/*
-    filterLocations: sets computed object based on resultList observableArray
-    Parameters:
-        Anonymous function: filters list or returns resultList Array
+    /*
+        filterLocations: sets computed object based on resultList observableArray
+        Parameters:
+            Anonymous function: filters list or returns resultList Array
 
-*/
+    */
     this.filterLocations = ko.computed(function() {
         if(!self.txtFilter()) {
             return self.resultList();
         } else {
             var oTempArr = ko.utils.arrayFilter(self.resultList(), function(loc) {
-                 return loc.name().toLowerCase().indexOf(self.txtFilter().toLowerCase())>=0;
+                 return loc.name.toLowerCase().indexOf(self.txtFilter().toLowerCase())>=0;
             });
             self.refreshLocations(oTempArr);
             return oTempArr;
         }
     });
-/*
-    showDetails: Enables details for a particular location fro the list
-    Parameters:
-        index: array of location data to be used by each marker and infoWindow
-*/
+    /*
+        showDetails: Enables details for a particular location fro the list
+        Parameters:
+            index: array of location data to be used by each marker and infoWindow
+    */
     this.showDetails = function(index) {
         if(markers)
         {
             var desc = self.filterLocations()[index()].description();
-            var lat = self.filterLocations()[index()].lat();
-            var lng = self.filterLocations()[index()].lng();
+            var lat = self.filterLocations()[index()].lat;
+            var lng = self.filterLocations()[index()].lng;
             self.refreshLocations(self.filterLocations());
             self.filterLocations()[index()].descVisible(true);
             setMarker(markers[index()],desc);
@@ -170,7 +123,7 @@ var ViewModel = function() {
     self.filter = function () {
         self.txtFilter({name:self.txtFilter()});
     }
-    this.currentLocation = ko.observable(this.resultList()[0]);
+
 }
 
 ko.applyBindings(new ViewModel())
