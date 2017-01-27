@@ -19,20 +19,12 @@ var locations = [
     {lat: 40.92, lng: -110.39,name:'Uinta-Wasatch-Cache National Forest',description:''},
     {lat: 41.92, lng: -110.39,name:'Kemmerer',description:''}
 ];
-
-var filteredLocations;
-var Location = function(data,index) {
-    var self = this;
-    this.name = data.name;
-    this.lat = data.lat;
-    this.lng = data.lng;
-    this.description = ko.observable('');
-    this.getDescription = ko.computed(function() {
-        this.description('No data received for this location');
+function getDescription(name,index,cb){
+    if (locations[index].description == '') {
         url = 'http://en.wikipedia.org/w/api.php'
         url += '?' + $.param({
           'action': 'opensearch',
-          'search': this.name,
+          'search': name,
           'format':'json'
         });
         var w_items = [];
@@ -42,15 +34,33 @@ var Location = function(data,index) {
             'crossDomain':true,
             'success':function(data) {
                 console.log(data);
+                locations[index].description = 'No descriptions found in Wikipedia';
                 $.each( data[2], function( key, val ) {
                     if (val.length > 10)
-                        self.description(val);
+                        locations[index].description = val;
                 });
-                wikiData.push(data);
+                cb(locations[index].description);
+
+                //wikiData.push(data);
             }
         }).fail(function(jqXHR, textStatus){
             console.log('No descriptions found in Wikipedia: '+textStatus);
+            this.description('Error getting description: ' + textStatus);
         })
+    } else {
+        cb(locations[index].description);
+    }
+}
+var filteredLocations;
+var Location = function(data,index) {
+    var self = this;
+    this.name = data.name;
+    this.lat = data.lat;
+    this.lng = data.lng;
+    this.description = ko.observable(data.description);
+    this.getDescription = ko.computed(function() {
+        getDescription(self.name,index,function(desc){self.description(desc);});
+
     },this);
     this.descVisible = ko.observable(false);
 }
@@ -82,8 +92,6 @@ var ViewModel = function() {
         filteredLoc.forEach(function(loc,index) {
             filteredLocations.push(formatLoc(loc.lat,loc.lng,loc.name,loc.description(),loc.descVisible(false)));
         })
-        clearMarkers();
-        initMarkers(filteredLocations);
     }
     /*
         filterLocations: sets computed object based on resultList observableArray
@@ -95,10 +103,18 @@ var ViewModel = function() {
         if(!self.txtFilter()) {
             return self.resultList();
         } else {
-            var oTempArr = ko.utils.arrayFilter(self.resultList(), function(loc) {
-                 return loc.name.toLowerCase().indexOf(self.txtFilter().toLowerCase())>=0;
+            var oTempArr = ko.utils.arrayFilter(self.resultList(), function(loc,index) {
+                var result;
+                if (loc.name.toLowerCase().indexOf(self.txtFilter().toLowerCase())>=0) {
+                    markers[index].setVisible(true);
+                    result = true;
+                } else {
+                    markers[index].setVisible(false);
+                    result = false;
+                }
+                return result;
             });
-            self.refreshLocations(oTempArr);
+            //self.refreshLocations(oTempArr);
             return oTempArr;
         }
     });
@@ -110,14 +126,13 @@ var ViewModel = function() {
     this.showDetails = function(index) {
         if(markers)
         {
-            var desc = self.filterLocations()[index()].description();
             var lat = self.filterLocations()[index()].lat;
             var lng = self.filterLocations()[index()].lng;
+            var name = self.filterLocations()[index()].name;
             self.refreshLocations(self.filterLocations());
             self.filterLocations()[index()].descVisible(true);
-            setMarker(markers[index()],desc);
+            setMarker(markers[index()],index(),name);
             map.setCenter({lat:lat,lng:lng});
-            setMarker(markers[index()],desc);
         }
 
     }
@@ -125,6 +140,6 @@ var ViewModel = function() {
         self.txtFilter({name:self.txtFilter()});
     }
 
-}
+} // End ViewModel
 
 ko.applyBindings(new ViewModel())

@@ -30,7 +30,7 @@ function initMarkers(data) {
         marker.addListener('click', function() {
             if (marker.setAnimation)
             {
-                setMarker(this,locations[i].description);
+                setMarker(this,i,locations[i].name);
             }
         });
 
@@ -43,7 +43,7 @@ function initMarkers(data) {
 var formatLoc = function(lat,lng,name,desc) {
     return {lat:lat,lng:lng,name:name,description:desc};
 }
-function setMarker(marker,desc) {
+function setMarker(marker,index,name) {
     if (marker)
     {
         stopAnimation();
@@ -57,7 +57,9 @@ function setMarker(marker,desc) {
 
     if (infoWindow)
         infoWindow.close();
-    infoWindow.setContent(desc);
+    getDescription(name,index,function(desc){
+        infoWindow.setContent(desc);
+    });
     infoWindow.open(map,marker);
 
 }
