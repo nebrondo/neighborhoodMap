@@ -21,7 +21,7 @@ var locations = [
 ];
 function getDescription(name,index,cb){
     if (locations[index].description == '') {
-        url = 'http://en.wikipedia.org/w/api.phpo'
+        url = 'http://en.wikipedia.org/w/api.php'
         url += '?' + $.param({
           'action': 'opensearch',
           'search': name,
@@ -70,7 +70,7 @@ var Location = function(data,index) {
 */
 var ViewModel = function() {
     var self = this;
-    this.txtFilter = ko.observable();
+    this.txtFilter = ko.observable("");
     this.resultList = ko.observableArray([]);
     this.initLocations = ko.computed(function(){
         locations.forEach(
@@ -102,7 +102,8 @@ var ViewModel = function() {
     */
     this.filterLocations = ko.computed(function() {
         if(!self.txtFilter()) {
-            return self.resultList();
+            // return self.resultList();
+            return "";
         } else {
             var oTempArr = ko.utils.arrayFilter(self.resultList(), function(loc,index) {
                 var match = loc.name.toLowerCase().indexOf(self.txtFilter().toLowerCase())>=0;

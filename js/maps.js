@@ -26,7 +26,7 @@ function initMarkers(data) {
             position: {lat:location.lat,lng:location.lng},
             title: location.name,
           });
-
+        marker.setVisible(false);
         marker.addListener('click', function() {
             if (marker.setAnimation)
             {

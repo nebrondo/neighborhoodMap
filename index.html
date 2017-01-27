@@ -12,7 +12,7 @@
         <label>Filter locations: </label>
         <input type="text" data-bind="value: txtFilter, valueUpdate: 'afterkeydown'">
         <ul data-bind="foreach: filterLocations" class="result-list">
-            <li data-bind="text: name, click: function() { $parent.showDetails($index) }"> Bla </li>
+            <li data-bind="text: name, click: function() { $parent.showDetails($index) }"></li>
                 <blockquote data-bind="text: description, visible: descVisible" class=""></blockquote>
         </ul>
 
