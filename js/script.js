@@ -45,7 +45,8 @@ function getDescription(name,index,cb){
             }
         }).fail(function(jqXHR, textStatus){
             console.log('No descriptions found in Wikipedia: '+textStatus);
-            this.description('Error getting description: ' + textStatus);
+            locations[index].description('Error getting description: ' + textStatus);
+            cb(locations[index].description);
         })
     } else {
         cb(locations[index].description);
@@ -104,15 +105,9 @@ var ViewModel = function() {
             return self.resultList();
         } else {
             var oTempArr = ko.utils.arrayFilter(self.resultList(), function(loc,index) {
-                var result;
-                if (loc.name.toLowerCase().indexOf(self.txtFilter().toLowerCase())>=0) {
-                    markers[index].setVisible(true);
-                    result = true;
-                } else {
-                    markers[index].setVisible(false);
-                    result = false;
-                }
-                return result;
+                var match = loc.name.toLowerCase().indexOf(self.txtFilter().toLowerCase())>=0;
+                markers[index].setVisible(match);
+                return match;
             });
             //self.refreshLocations(oTempArr);
             return oTempArr;
