@@ -26,7 +26,7 @@ function initMarkers(data) {
             position: {lat:location.lat,lng:location.lng},
             title: location.name,
           });
-        marker.setVisible(false);
+        //marker.setVisible(false);
         marker.addListener('click', function() {
             if (marker.setAnimation)
             {
@@ -69,6 +69,12 @@ function stopAnimation() {
         for (var i = 0; i < markers.length; i++) {
           markers[i].setAnimation(null)
         }
+    }
+}
+// Sets all Markers to visible
+function showAllMarkers() {
+    for (var i = 0; i < markers.length; i++) {
+        markers[i].setVisible(true);
     }
 }
 // Sets the map on all markers in the array.

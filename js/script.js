@@ -102,8 +102,9 @@ var ViewModel = function() {
     */
     this.filterLocations = ko.computed(function() {
         if(!self.txtFilter()) {
-            // return self.resultList();
-            return "";
+            if (markers && markers.length > 0)
+                showAllMarkers();
+            return self.resultList();
         } else {
             var oTempArr = ko.utils.arrayFilter(self.resultList(), function(loc,index) {
                 var match = loc.name.toLowerCase().indexOf(self.txtFilter().toLowerCase())>=0;
